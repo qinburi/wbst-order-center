@@ -1,0 +1,86 @@
+flowchart TB
+    subgraph customerLane ["客户"]
+        mAccess["获取下单授权"]
+        mDemand["填写下单需求"]
+        mSubmit["提交预订单"]
+        mSupplement["补充资料"]
+        mCustomer["客户确认订单"]
+        mSigned(["签收完成"])
+    end
+
+    subgraph marketLane ["市场部"]
+        mReceive["受理预订单"]
+        mArrange["整理核心数据"]
+        mSupply["确认供货及拆单"]
+        mInternal["内部审核/发送确认单"]
+        mFormal["转正式销售订单"]
+    end
+
+    subgraph financeLane ["财务部"]
+        mCredit["信用/账期/改价审批"]
+        mTransferFail["转单失败待处理"]
+        mReconcile(["对账/开票/回款"])
+    end
+
+    subgraph productionLane ["计划/生产部"]
+        mSchedule["交期测算/生产安排"]
+        mComplete["生产完工反馈"]
+        mRefusal["进入拒收处理"]
+    end
+
+    subgraph warehouseLane ["仓储/物流部"]
+        mInventory["库存核实/临时预占"]
+        mRelease["释放临时预占"]
+        mLock["正式锁库/生产供货"]
+        mShip["发货/物流跟踪"]
+    end
+
+    mAccess --> mDemand --> mSubmit
+    mSubmit --> mReceive
+    mReceive -->|"资料完整"| mArrange
+    mReceive -.->|"资料不完整"| mSupplement
+    mSupplement -.->|"补充后重提"| mArrange
+    mArrange -->|"核实库存"| mInventory
+    mInventory -->|"库存充足"| mCredit
+    mInventory -->|"库存不足"| mSchedule
+    mSchedule --> mCredit
+    mCredit -->|"审批通过"| mSupply
+    mCredit -.->|"未通过"| mArrange
+    mSupply --> mInternal
+    mInternal -->|"审核通过"| mCustomer
+    mInternal -.->|"审核驳回"| mArrange
+    mCustomer -->|"确认"| mFormal
+    mCustomer -.->|"拒绝/要求修改"| mArrange
+    mCustomer -.->|"确认超时"| mRelease
+    mRelease -.->|"释放后返回待处理"| mArrange
+    mFormal --> mLock
+    mFormal -.->|"生成失败"| mTransferFail
+    mTransferFail -.->|"修正后重试"| mFormal
+    mLock -->|"库存供货"| mShip
+    mLock -->|"生产供货"| mComplete
+    mComplete --> mShip
+    mShip -->|"客户签收"| mSigned
+    mShip -.->|"客户拒收"| mRefusal
+    mSigned --> mReconcile
+
+    classDef customer fill:#eef4ff,stroke:#4b7fd5,color:#315faa
+    classDef market fill:#eaf7ef,stroke:#2a9558,color:#286545
+    classDef finance fill:#fff8e8,stroke:#d29b32,color:#815e17
+    classDef production fill:#eaf8f7,stroke:#359b98,color:#246b69
+    classDef warehouse fill:#f0f5fa,stroke:#6689ad,color:#416789
+    classDef warn fill:#fff4df,stroke:#e8991a,color:#8b5b0e,stroke-dasharray: 6 4
+    classDef endNode fill:#e5f6eb,stroke:#239259,color:#176e43
+
+    class mAccess,mDemand,mSubmit,mSupplement,mCustomer customer
+    class mReceive,mArrange,mSupply,mInternal,mFormal market
+    class mCredit,mTransferFail,mReconcile finance
+    class mSchedule,mComplete,mRefusal production
+    class mInventory,mRelease,mLock,mShip warehouse
+    class mSupplement,mRelease,mTransferFail,mRefusal warn
+    class mSigned,mReconcile endNode
+
+    style customerLane fill:#f8fbff,stroke:#b8cbed
+    style marketLane fill:#f7fcf9,stroke:#b9ddc7
+    style financeLane fill:#fffdf6,stroke:#ead5a9
+    style productionLane fill:#f6fcfb,stroke:#b6dedb
+    style warehouseLane fill:#f7fafc,stroke:#c3d1df
