@@ -1,0 +1,13 @@
+.DS_Store
+*.rp
+*.rpprj
+*.bak
+*.tmp
+AGENTS.md
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+*.pdf
