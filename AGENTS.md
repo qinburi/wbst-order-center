@@ -13,13 +13,15 @@ Do not upload private research notes, contracts, PRDs, real customer names, cont
 
 ## Product Boundaries
 
-- Internal PC covers order operations, customer authorization, sales master data, customer credit, workflow review pages, dense lists, details, dialogs, approvals, row expansion, and local demo persistence.
+- Internal PC covers order operations, customer management and authorization, customer credit, workflow review pages, dense lists, details, dialogs, approvals, row expansion, and local demo persistence.
 - Customer PC covers customer order workbench, order creation, order detail, confirmation, and messages.
 - Mobile covers customer-side quick order, order tracking, confirmation, after-sales entry, address, authorization, and messages.
 - Customer-facing pages must not expose internal credit details, internal approvers, missing material details, transfer failure reasons, or internal responsibility departments.
 
 ## Menus And Flows
 
+- Customer Management owns customer subjects, customer accounts, customer authorization management, and authorization approval records. Do not add a separate top-level customer authorization entry.
+- Customer authorization uses one current authorization record per customer subject. Its list, row expansion, details, create/edit/renew, pause/resume, approval linkage, and local demo persistence must stay functional.
 - Order Center menus must map to the order workbench, order entry, preorders, exception pool, order approval, formal sales orders, order changes, fulfillment/logistics, returns/rejection, reconciliation/payment, and the order business flow page.
 - Customer Credit menus must map to the credit workbench, credit profile, credit limit, credit approval, receivable/overdue, freeze/release, credit rules, and the credit business flow page.
 - Flow diagrams use real business participants such as customer, sales, finance, planning/production, warehouse/logistics, and approvers. Do not add a generic system lane.
