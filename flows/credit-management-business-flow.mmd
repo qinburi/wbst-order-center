@@ -1,0 +1,86 @@
+flowchart TB
+    subgraph accessView ["授信准入与复评"]
+        direction TB
+        caRules["财务部：维护信用评估与审批规则"]
+        caSubmit["客户：提交客户资质资料"]
+        caBuild["市场部：建立信用档案并发起申请"]
+        caAssess["财务部：完成信用评估"]
+        caSupplement["市场部：补充或修正资料"]
+        caPlan["财务部：确定等级、额度、账期及有效期"]
+        caApprove["审批负责人：分级审批授信方案"]
+        caRevise["财务部：调整授信方案"]
+        caEffective["财务部：授信生效并建立额度"]
+        caMonitor["财务部：到期预警与信用监控"]
+        caReview["财务部：年度或临时复评"]
+        caOutcome(["审批负责人：续期、调额、冻结或失效"])
+
+        caRules --> caAssess
+        caSubmit --> caBuild --> caAssess
+        caAssess -->|"资料完整"| caPlan --> caApprove
+        caAssess -.->|"资料不完整"| caSupplement
+        caSupplement -.->|"补充后重评"| caAssess
+        caApprove -->|"通过"| caEffective --> caMonitor --> caReview --> caOutcome
+        caApprove -.->|"驳回"| caRevise
+        caRevise -.->|"调整后重提"| caPlan
+    end
+
+    subgraph occupancyView ["订单额度占用与释放"]
+        direction TB
+        coPreorder["客户：提交预订单"]
+        coSimulate["财务部：信用模拟检查"]
+        coReview["市场部：客户确认及转单前复核"]
+        coException["财务部：信用异常进入审批"]
+        coFormal["市场部：生成正式销售订单"]
+        coOccupy["财务部：占用正式未发货额度"]
+        coShipCheck["财务部：发货前再次信用复核"]
+        coShip["仓储/物流部：执行出库发货"]
+        coShipped["财务部：迁移至已发货未应收"]
+        coReceivable["财务部：形成应收并迁移占用"]
+        coPayment["客户/财务部：付款并完成核销"]
+        coAdjust["市场部：订单作废或数量减少"]
+        coReturn["财务部：退货、红字或冲抵入账"]
+        coRelease(["财务部：释放对应信用额度"])
+
+        coPreorder --> coSimulate
+        coSimulate -->|"信用正常"| coReview --> coFormal --> coOccupy --> coShipCheck
+        coSimulate -.->|"超额或逾期"| coException
+        coException -.->|"审批通过"| coReview
+        coShipCheck -->|"复核通过"| coShip --> coShipped --> coReceivable
+        coShipCheck -.->|"复核不通过"| coException
+        coReceivable -->|"客户付款"| coPayment -->|"核销确认"| coRelease
+        coReceivable -.->|"作废或减量"| coAdjust --> coRelease
+        coReceivable -.->|"退货或红字"| coReturn -->|"财务入账"| coRelease
+    end
+
+    subgraph exceptionView ["信用异常与放行"]
+        direction TB
+        ceRules["财务部：维护异常触发与放行规则"]
+        ceDetect["财务部：识别信用异常并生成待办"]
+        ceBlock["财务部：拦截转正式订单及发货"]
+        ceApply["市场部：提交临时额度或放行申请"]
+        ceReview["财务部：复核风险与申请范围"]
+        ceApprove["审批负责人：分级审批信用例外"]
+        ceReject["市场部/财务部：驳回并维持原管控"]
+        ceRelease["财务部：建立临时额度或指定放行"]
+        ceExecute["仓储/物流部：执行指定订单或发货任务"]
+        ceExpire(["财务部：到期失效并恢复原管控"])
+
+        ceRules --> ceDetect --> ceBlock --> ceApply --> ceReview --> ceApprove
+        ceApprove -->|"通过"| ceRelease --> ceExecute --> ceExpire
+        ceApprove -.->|"驳回"| ceReject
+        ceReject -.->|"维持拦截"| ceBlock
+    end
+
+    classDef customer fill:#eef4ff,stroke:#4b7fd5,color:#315faa
+    classDef market fill:#eaf7ef,stroke:#2a9558,color:#286545
+    classDef finance fill:#fff8e8,stroke:#d29b32,color:#815e17
+    classDef approver fill:#f5f0ff,stroke:#8b6fc8,color:#654c9d
+    classDef warehouse fill:#f0f5fa,stroke:#6689ad,color:#416789
+    classDef warning fill:#fff4df,stroke:#e8991a,color:#8b5b0e,stroke-dasharray:6 4
+
+    class caSubmit,coPreorder,coPayment customer
+    class caBuild,caSupplement,coReview,coFormal,coAdjust,ceApply,ceReject market
+    class caRules,caAssess,caPlan,caRevise,caEffective,caMonitor,caReview,coSimulate,coException,coOccupy,coShipCheck,coShipped,coReceivable,coReturn,coRelease,ceRules,ceDetect,ceBlock,ceReview,ceRelease,ceExpire finance
+    class caApprove,caOutcome,ceApprove approver
+    class coShip,ceExecute warehouse
+    class caSupplement,caRevise,coException,coAdjust,coReturn,ceBlock,ceReject warning
