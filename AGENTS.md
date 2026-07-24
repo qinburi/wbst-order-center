@@ -57,6 +57,7 @@ Do not upload private research notes, contracts, PRDs, real customer names, cont
 
 ## Version Protection
 
+- `V1.0.0` was explicitly re-baselined from the current prototype on 2026-07-24. Treat this rebuilt snapshot, tag, and release as immutable.
 - Do not change `V1.0.0`, `VERSION_HISTORY`, `CHANGELOG.md`, Git tags, releases, or `versions/v1.0.0/index.html` for ordinary prototype fixes.
 - A new version requires coordinated updates to current version data, immutable snapshot, changelog, tag, and release.
 - Public updates must remain sanitized and must not overwrite the private working prototype.
